@@ -5,9 +5,9 @@ import {} from 'dotenv/config'
 
 //const bucketName = ;
 const region = "us-east-1";
-const accessKeyId = "ASIA567JEWZ72FLPFBVK";
-const secretAccessKey = "CEWX4LjeyUsDh71Vnu9sI0v9r48O4wwe0mS7+K7j";
-const sessionToken = "FwoGZXIvYXdzEOP//////////wEaDJW3ReP0YNbfZSisXSLOAYwepLICf/rnpoGGk2liIQ0YpLbzYEfllp/T4zEquwILHBd6fYtpGK5IiKChQVFbTrSsHxvhp/HObB9l8tn7HQdwUOpdF5VWNDEMjtkMUUweL1TwpODFlTbL9wNDpgeBtYAPEg4qIpob3a6C0abe2taqyWtCzCMyypuoh70shFmTLCoeNr0wC4RbkykNb/AZPo6SXGCykhTLXN97X8SrjfsD6i1jGzAEfU9FL5YLIj6oMNroi5QGZ0rpqQ1U+5h5aGvd90jgLXIU0Pvjhi9+KP++wpQGMi2erXDD3igLwzmMrpevuMuwdHXSfu//jG3vCC2iHab8wfzSi2BaHbIIeZPH+8w=";
+const accessKeyId = "ASIA567JEWZ7SQ54WE7L";
+const secretAccessKey = "DSKD4pe1EB2Dw37BpN8mRwqV/dITevsL7EaFGBqd";
+const sessionToken = "FwoGZXIvYXdzEOr//////////wEaDE3MXNUJhssLYRvF6iLOAXWE/etrGwL1IKJf2jGf+auowECXl2kTIzHDZ0s+FmFrxwlQoiZbazDrYOj2LHN2AHMiAYy9yOlRCZ7ZWBnDHP+cwkloXPe4WegcR0wVRcAcTc2n8nZnch0BfmpJvOipUugakUva2NCKBNCk6zReE9OHHG8RJP9YMqjNAfeLZ/Dos4P2sTW3eeMis98vXwsPcg9vRLx0miemcsZYOIqH5uUGCyES3KFRGC0wgb4vPbG6aW4W/vi3HnXuz8OX98P/fvMI5z3szc8ZOhUzBQsqKM/3w5QGMi1G81hQsCI824ovRBrwq+nY8U3edm6MhXAx67DTeE6AP3D7u0kZ1pBEOwAuqcg=";
 
 const s3 = new S3 ({
     region,

@@ -8,12 +8,21 @@ const unlinkFIle = util.promisify(fs.unlink);
 // const util = require('util');
 //const unlinkFIle = util.promisify(fs.unlink);
 
+function validateData(alumno){
+  let errors = 0;
+  errors += (typeof alumno.nombres === 'string');
+  errors += (typeof alumno.apellidos === 'string');
+  errors += (typeof alumno.matricula === 'string');
+  errors += (typeof alumno.promedio === 'number');
+  return errors === 4;
+}
+
 export async function getAlumnos(req, res) {
   try {
     const alumnos = await Alumnos.findAll({
       atributes: ["id", "nombres", "apellidos", "matricula", "promedio","fotoPerfilUrl"],
     });
-    res.json(alumnos);
+    res.status(200).json(alumnos);
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -23,26 +32,31 @@ export async function getAlumnos(req, res) {
 
 export async function createAlumno(req, res) {
   const {nombres, apellidos, matricula, promedio} = req.body;
-  console.log(req.body);
-  try {
-    let newAlumno = await Alumnos.create(
-      {
-        nombres:nombres,
-        apellidos:apellidos,
-        matricula:matricula,
-        promedio:promedio,
-      },
-      {
-        fields: ["nombres", "apellidos", "matricula", "promedio","fotoPerfilUrl"]
-      }
-    );
-    return res.json(newAlumno);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+  let dataIsValid = validateData({nombres, apellidos, matricula, promedio} );
+  if (!dataIsValid){
+    res.status(400).json({error: 'Invalid Request Format.'});
+  } else if (nombres && apellidos && matricula && promedio) {
+    try {
+      let newAlumno = await Alumnos.create(
+        {
+          nombres:nombres,
+          apellidos:apellidos,
+          matricula:matricula,
+          promedio:promedio,
+        },
+        {
+          fields: ["nombres", "apellidos", "matricula", "promedio","fotoPerfilUrl"]
+        }
+      );
+      return res.status(201).json(newAlumno);
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+  } else {
+    res.status(500).json({error: 'There was an error.'});
   }
-  res.json("received");
 }
 
 export async function getAlumno(req, res) {
@@ -53,7 +67,7 @@ export async function getAlumno(req, res) {
         id,
       },
     });
-    res.json(alumno);
+    res.status(200).json(alumno);
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -65,15 +79,19 @@ export const updateAlumno = async (req, res) => {
   try {
     const { id } = req.params;
     const { nombres, apellidos, matricula, promedio} = req.body;
+    let dataIsValid = validateData({ nombres, apellidos, matricula, promedio});
+    if (!dataIsValid){
+      res.status(400).json({error: 'Invalid Request Format.'});
+    } else {
+      const alumno = await Alumnos.findByPk(id);
+      alumno.nombres = nombres;
+      alumno.apellidos = apellidos;
+      alumno.matricula = matricula;
+      alumno.promedio = promedio;
+      await alumno.save();
 
-    const alumno = await Alumnos.findByPk(id);
-    alumno.nombres = nombres;
-    alumno.apellidos = apellidos;
-    alumno.matricula = matricula;
-    alumno.promedio = promedio;
-    await alumno.save();
-
-    res.json(alumno);
+      return res.status(200).json(alumno);
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -82,12 +100,20 @@ export const updateAlumno = async (req, res) => {
 export async function deleteAlumno(req, res) {
   const { id } = req.params;
   try {
-    await Alumnos.destroy({
+    const alumnoExist = await Alumnos.findOne({
       where: {
         id,
       },
     });
-    return res.sendStatus(204);
+    if (alumnoExist){ await Alumnos.destroy({
+      where: {
+        id,
+      },
+    });
+    return res.status(200).sendStatus(200);
+    } else {
+      return res.status(404).sendStatus(404);
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -103,8 +129,9 @@ export async function uploadPicture(req, res) {
     const alumno = await Alumnos.findByPk(id);
     alumno.fotoPerfilUrl = urlprefix + alumno.matricula + path.extname(req.file.originalname);
     await alumno.save();
-    res.json(alumno);
-    await unlinkFIle(req.file.path);
+    
+    //await unlinkFIle(req.file.path);
+    return res.status(200).json(alumno);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

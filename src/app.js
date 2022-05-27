@@ -11,6 +11,7 @@ const app = express();
 // Import routes
 import alumnosRoutes from "./routes/alumnos.routes.js";
 import profesoresRoutes from "./routes/profesores.routes.js";
+import routerRoutes from "./routes/router.routes.js";
 
 // Middlewares
 app.use(morgan("dev"));
@@ -33,21 +34,26 @@ const upload = multer({
   dest: path.join(__dirname,'./public/uploads/'),
   //limits: {fileSize: 1000000},
   fileFilter: (req, file, cb) => {
-      const fileTypes = /jpeg|jpg|png|gif/;
-      const mimeType = fileTypes.test(file.mimetype);
-      const extName = fileTypes.test(path.extname(file.originalname));
-      console.log(file.originalname)
-      if(mimeType && extName){
-          return cb(null, true);
-      }
-      cb('Error: Archivo no válido');
+      // const fileTypes = /jpeg|jpg|png|gif/;
+      // const mimeType = fileTypes.test(file.mimetype);
+      // const extName = fileTypes.test(path.extname(file.originalname));
+      // console.log(file.originalname)
+      // if(mimeType && extName){
+      return cb(null, true);
+      // }
+      // cb('Error: Archivo no válido');
   }
-}).single('image')
+}).single('foto')
 app.use(upload);
 
 
 // Routes
 app.use("/alumnos", alumnosRoutes);
 app.use("/profesores", profesoresRoutes);
+app.use('/',routerRoutes);
+app.use(function(req, res) {
+  res.status(404).json({error:'Wrong Request'});
+});
+
 
 export default app;
