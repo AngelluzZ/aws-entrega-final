@@ -1,4 +1,12 @@
 import { Profesores } from "../models/profesores.js";
+import {uploadFile} from '../s3.js'
+import fs from "fs";
+import path from "path";
+import util from "util";
+const unlinkFIle = util.promisify(fs.unlink);
+// const fs = require('fs');
+// const util = require('util');
+//const unlinkFIle = util.promisify(fs.unlink);
 
 export async function getProfesores(req, res) {
   try {
@@ -14,7 +22,7 @@ export async function getProfesores(req, res) {
 }
 
 export async function createProfesor(req, res) {
-  const {nombres, apellidos, numeroEmpleado, horasClase, fotoPerfilUrl} = req.body;
+  const {nombres, apellidos, numeroEmpleado, horasClase} = req.body;
   try {
     let newProfesor = await Profesores.create(
       {
@@ -22,7 +30,6 @@ export async function createProfesor(req, res) {
         apellidos,
         numeroEmpleado,
         horasClase,
-        fotoPerfilUrl
       },
       {
         fields: ["nombres", "apellidos", "numeroEmpleado", "horasClase","fotoPerfilUrl"]
@@ -80,6 +87,22 @@ export async function deleteProfesor(req, res) {
       },
     });
     return res.sendStatus(204);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+export async function uploadPicture(req, res) {
+  const urlprefix = "https://a16003152-files.s3.amazonaws.com/"
+  const { id } = req.params;
+  uploadFile(req.file)
+  console.log(req.file)
+  try {
+    const profesor = await Profesores.findByPk(id);
+    profesor.fotoPerfilUrl = urlprefix + profesor.numeroEmpleado + path.extname(req.file.originalname);
+    await profesor.save();
+    res.json(profesor);
+    await unlinkFIle(req.file.path);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
